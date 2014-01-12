@@ -1,0 +1,43 @@
+doctype html
+html
+  head
+    title Home Finance
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    meta(charset="utf-8")
+    link(rel="stylesheet", href="/stylesheets/style.css")
+    link(href="/bootstrap/css/bootstrap.min.css", rel="stylesheet", media="screen")
+    script(src="/javascripts/jquery.js")
+    script(src="/bootstrap/js/bootstrap.js")
+    block headers
+  body
+    .navbar.navbar-default.navbar-static-top
+        .container
+            .navbar-header
+                a.navbar-brand(href="/") Home Finance
+            .navbar-inner
+                ul.nav.navbar-nav
+                    li.dropdown
+                        a.dropdown-toggle(href="#", data-toggle="dropdown") 
+                            | Reports&nbsp;
+                            b.caret
+                        ul.dropdown-menu
+                            li: a(href="/expense") Expenses
+                            li: a(href="/report/overview") Overview
+                            li: a(href="/report/month") Month
+                    li.dropdown
+                        a.dropdown-toggle(href="#", data-toggle="dropdown") 
+                            | Settings&nbsp;
+                            b.caret
+                        ul.dropdown-menu
+                            li: a(href="/category") Categories
+                            li.divider
+                            li: a(href="/import") Import data
+                            li: a(href="/export") Export data
+                            li
+                                a(href="/clear", onclick="if (confirm('Are you sure?')) { $('#deleteForm').submit() } return false") Trash data
+
+    form#deleteForm.hidden(method="POST", action="/clear")
+        input(type="hidden", name="_method", value="DELETE")
+
+    .container
+        block content

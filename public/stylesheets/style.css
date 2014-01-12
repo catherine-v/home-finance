@@ -1,0 +1,15 @@
+body {
+  /*padding: 50px;*/
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+form#filter.form-inline {
+    margin-bottom: 20px;
+}
+form.form-inline .form-group {
+    margin-right: 20px;
+}

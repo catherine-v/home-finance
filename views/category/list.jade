@@ -1,0 +1,33 @@
+extends ../layout
+
+block content
+    .row
+        ol.breadcrumb
+            li: a(href="/") Home
+            li.active Categories
+    .row
+        .col-md-6
+            .row
+                .col-md-6
+                    h1 Categories
+                .col-md-6
+                    a.pull-right.btn.btn-lg.btn-primary(href="/category/new", style="margin-top: 10px") New category
+            
+            table.table.table-hover.table-condensed
+                tr
+                    th Caption
+                    th.text-right Total spent
+                    th
+                    th
+                - categories.forEach(function (category) {
+                    tr 
+                        td: a(href="/category/" + category._id)= category.name
+                        td.text-right= (total[category._id] || 0).toFixed(2)
+                        td: a(href="/category/" + encodeURIComponent(category.name) + "/expenses") Show expenses
+                        td
+                            if total[category._id] == undefined
+                                form(action="/category/" + category._id, method="POST")
+                                    input(type="hidden", name="_method", value="DELETE")
+                                    a(onclick="if (confirm('Are you sure?')) { $(this).parent().submit() }")
+                                        span.glyphicon.glyphicon-trash
+                - })

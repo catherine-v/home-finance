@@ -1,0 +1,24 @@
+extends ../layout
+
+block content
+    .row
+        ol.breadcrumb
+            li: a(href="/") Home
+            li: a(href="/category") Categories
+            li.active= actionName
+
+    .row
+        h1 Category
+
+        form.form-horizontal(method="POST", action=action, role="form")
+            if method != "POST"
+                input(type="hidden", name="_method", value=method)
+
+            .form-group
+                label.control-label.col-md-1(for="name") Caption
+                .col-md-3
+                    input#name.form-control(name="name", value=category.name, autofocus)
+
+            .form-group
+                .col-md-offset-1.col-md-3
+                    input.btn.btn-primary(type="submit", value=actionName)

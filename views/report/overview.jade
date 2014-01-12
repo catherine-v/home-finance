@@ -1,0 +1,28 @@
+extends ../layout
+
+block headers
+    script(src="https://www.google.com/jsapi", type="text/javascript")
+    script(type="text/javascript").
+        google.load("visualization", "1", {packages:["corechart"]});
+        google.setOnLoadCallback(function () {
+            $.getJSON('/json/expense-overview', function (data) {
+                var chart = new google.visualization.AreaChart(document.getElementById('chart'));
+                chart.draw(google.visualization.arrayToDataTable(data), {
+                    vAxis: { minValue: 0 },
+                    //isStacked: true,
+                    legend: { position: 'bottom', maxLines: 4 }
+                });
+            });
+        });
+
+
+block content
+    .row
+        ol.breadcrumb
+            li: a(href="/") Home
+            li Reports
+            li.active Overview
+
+    .row
+        h1 Overview
+        #chart(style="height: 500px")

@@ -1,0 +1,72 @@
+extends ../layout
+
+block headers
+    script(src="https://www.google.com/jsapi", type="text/javascript")
+    script(type="text/javascript").
+        google.load("visualization", "1", {packages:["corechart"]});
+        google.setOnLoadCallback(function () {
+            $.getJSON('/json/month', { month: "#{curMonth}" }, function (data) {
+                // Calculate total
+                var total = data.reduce(function (res, next) { return res + next[1] }, 0);
+                
+                // Fill in the table
+                var $table = $('#report');
+                data.forEach(function (row, ind) {
+                    var $tr = $('<tr><td>' + row[0] + '</td><td class="text-right">' + row[1].toFixed(2) + '</td></tr>').appendTo($table);
+                    $tr.data('index', ind);
+                });
+                $table.append($('<tr><th>Total</th><th class="text-right">' + total.toFixed(2) + '</th></tr>'))
+
+                // Draw chart
+                data.unshift(["Category", "Spent"]);
+                var chart = new google.visualization.PieChart(document.getElementById('chart'));
+                chart.draw(google.visualization.arrayToDataTable(data), {
+                    legend: 'none',
+                    pieSliceText: 'none',
+                    chartArea: { left: 0, top: 10, width: '100%' }
+                });
+
+                google.visualization.events.addListener(chart, 'select', function () {
+                    $($table.find('tr.success')).removeClass('success');
+                    var selected = chart.getSelection();
+                    $($table.find('tr')[selected[0].row + 1]).addClass('success');
+                });
+
+                $table.find('tr').on('click', function (e) {
+                    var index = $(this).data('index');
+                    if (index != undefined) {
+                        chart.setSelection([{ row: index, col: null }]);
+                        $($table.find('tr.success')).removeClass('success');
+                        $(this).addClass('success');
+                    }
+                });
+            });
+        });
+
+
+block content
+    .row
+        ol.breadcrumb
+            li: a(href="/") Home
+            li Reports
+            li.active Month
+
+    .row
+        .col-md-3
+            form#report-form.form(method="GET", action="/report/month")
+                .form-group
+                    select#month.form-control.input-lg(name="month", onchange="$('#report-form').submit()")
+                        - monthList.forEach(function (month) {
+                            option(value=month, selected=(month == curMonth)) 
+                                - var d = (new Date(month + '-1')).toDateString().split(' ');
+                                = d[1] + ' ' + d[3]
+                        - })
+
+    .row
+        .col-md-4
+            #chart(style="height: 500px")
+        .col-md-4
+            table#report.table.table-hover.table-condensed
+                tr
+                    th Category
+                    th.text-right Spent

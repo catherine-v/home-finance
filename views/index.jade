@@ -1,0 +1,68 @@
+extends layout
+
+block headers
+    script(src="https://www.google.com/jsapi", type="text/javascript")
+    script(type="text/javascript").
+        google.load("visualization", "1", {packages:["corechart"]});
+        google.setOnLoadCallback(function () {
+            $.getJSON('/json/10days', function (data) {
+                var total = data.reduce(function (res, next) { return res + next[1] }, 0);
+                $('#total10').text(total.toFixed(2));
+                
+                data.unshift(["Category", "Spent"]);
+                var chart = new google.visualization.PieChart(document.getElementById('pie10'));
+                chart.draw(google.visualization.arrayToDataTable(data), {
+                    legend: { position: 'top', maxLines: 4 },
+                    pieSliceText: 'none'
+                });
+            });
+        });
+
+
+block content
+    .row
+        .col-md-7
+            .row
+                .col-md-6
+                    h2 Expenses
+                .col-md-6
+                    a.pull-right.btn.btn-lg.btn-primary(href="/expense/new", style="margin-top: 10px") New expense
+
+            table.table.table-hover.table-condensed
+                tr
+                    th Date
+                    th Caption
+                    th Amount
+                    th Price
+                    th Total
+                    th Category
+                    th
+
+                -expenses.forEach(function (expense) {
+                    tr
+                        td= expense.formatDate()
+                        td: a(href="/expense/#{expense._id}")= expense.name
+                        td= expense.count
+                        td= expense.price.toFixed(2)
+                        td= expense.sum.toFixed(2)
+                        td!= expense.category ? '<a href="/category/' + encodeURIComponent(expense.category.name) + '/expenses">' + expense.category.name + '</a>' : "&mdash;"
+                        td
+                            form(method="POST", action="/expense/#{expense._id}")
+                                input(type="hidden", name="_method", value="DELETE")
+                                a(onclick="if (confirm('Are you sure?')) { $(this).parent().submit() }")
+                                    span.glyphicon.glyphicon-trash
+                -});
+
+            ul.pager
+                li.previous(class=page > 1 ? "" : "disabled") 
+                    a(href=page > 1 ? "?p=" + (page - 1) : "#") Later
+                li: span Page #{page} of #{totalPages}
+                li.next(class=lastPage ? "disabled" : "") 
+                    a(href=lastPage ? "#" : "?p=" + (1 + page)) Earlier
+
+        .col-md-5
+            h2 Last 10 days' expenses
+            p.lead
+                | Total: 
+                strong#total10 Loading...
+            #pie10(style="height: 400px")

@@ -1,0 +1,25 @@
+extends ../layout
+
+block content
+    .row
+        ol.breadcrumb
+            li: a(href="/") Home
+            li.active Import data
+
+    h1 Choose file to import data
+
+    form.form-horizontal(method="POST", enctype="multipart/form-data", action="/import", role="form")
+        .form-group
+            label.control-label.col-md-1(for="file") File
+            .col-md-4
+                input#file(type="file", name="file")
+                span.help-block CSV-file with format according to documentation
+        .form-group
+            .col-md-4.col-md-offset-1
+                .checkbox
+                    label.control-label
+                        input#override(type="checkbox", name="override")
+                        | Replace data on same dates
+        .form-group
+            .col-md-4.col-md-offset-1
+                input.btn.btn-primary(type="submit", value="Import")

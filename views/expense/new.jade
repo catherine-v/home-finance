@@ -1,0 +1,45 @@
+extends ../layout
+
+block content
+    h1 Expense
+
+    form.form-horizontal(method="POST", action=action, role="form")
+        if method != "POST"
+            input(type="hidden", name="_method", value=method)
+        if referer
+            input(type="hidden", name="referer", value=referer)
+
+        .form-group
+            label.control-label.col-md-1(for="date") Date
+            .col-md-3
+                input#date.form-control(name="date", type="date", value=expense.date.toJSON().slice(0, 10))
+
+        .form-group
+            label.control-label.col-md-1(for="name") Caption
+            .col-md-3
+                input#name.form-control(name="name", value=expense.name, autofocus)
+
+        .form-group
+            label.control-label.col-md-1(for="count") Amount
+            .col-md-3
+                input#count.form-control(name="count", value=expense.count || 1)
+
+        .form-group
+            label.control-label.col-md-1(for="price") Price
+            .col-md-3
+                input#price.form-control(name="price", value=(expense.price ? expense.price.toFixed(2) : ''))
+
+        .form-group
+            label.control-label.col-md-1(for="category") Category
+            .col-md-3
+                select#category.form-control(name="category")
+                    - categories.forEach(function(cat) {
+                        option(value=cat._id, selected=(expense.category == cat._id.toString()))= cat.name
+                    - });
+
+        .form-group
+            .col-md-offset-1.col-md-3
+                if createNew
+                    input.btn.btn-primary(type="submit", name="continue", value=actionName + " and continue")
+                    &nbsp;
+                input.btn.btn-primary(type="submit", value=actionName)                

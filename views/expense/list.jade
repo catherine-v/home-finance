@@ -1,0 +1,66 @@
+extends ../layout
+
+block content
+    .row
+        ol.breadcrumb
+            li: a(href="/") Home
+            li Reports
+            li.active Expenses
+    .row
+        .col-md-12
+            h1 Expenses
+            form#filter.form.form-inline(action="/expense", method="GET", role="form")
+                input#page(type="hidden", name="p", value=page)
+                .form-group
+                    select#category.form-control.input-sm(name="category")
+                        option(value="") - Category -
+                        - categories.forEach(function (cat) {
+                            option(value=cat._id, selected=(cat._id == filter.category))= cat.name
+                        - })
+                .form-group
+                    label.control-label(for="from") Period &nbsp;
+                    input#from.form-control.input-sm(name="startDate", type="date", style="width: 150px",
+                        value=(filter.date ? filter.date.$gte.toJSON().slice(0, 10) : ""))
+                    label.control-label(for="to") &nbsp;&mdash;&nbsp;
+                    input#to.form-control.input-sm(name="endDate", type="date", style="width: 150px",
+                        value=(filter.date ? filter.date.$lte.toJSON().slice(0, 10) : ""))
+
+                .form-group
+                    input#str.form-control.input-sm(name="name", style="width: 200px", placeholder="Caption search",
+                        value=(filter.name ? filter.name.$regex : ""))
+
+                .form-group
+                    input.btn.btn-sm.bnt-default(type="submit", value="Filter")
+    .row
+        .col-md-7
+            p.lead
+                | Total:&nbsp;
+                = total.toFixed(2)
+
+            table.table.table-hover.table-condensed
+                tr
+                    th Date
+                    th Caption
+                    th Amount
+                    th Price
+                    th Total
+                    th Category
+
+                -expenses.forEach(function (expense) {
+                    tr
+                        td= expense.formatDate()
+                        td: a(href="/expense/#{expense._id}")= expense.name
+                        td= expense.count
+                        td= expense.price.toFixed(2)
+                        td= expense.sum.toFixed(2)
+                        td!= expense.category ? '<a href="/category/' + encodeURIComponent(expense.category.name) + '/expenses">' + expense.category.name + '</a>' : "&mdash;"
+                -});
+
+            ul.pager
+                li.previous(class=page > 1 ? "" : "disabled") 
+                    a(href=page > 1 ? "?p=" + (page - 1) : "#",
+                        onclick=page > 1 ? "$('#page').val(#{page - 1}); $('#filter').submit(); return false" : "") Later
+                li: span Page #{page} of #{totalPages}
+                li.next(class=lastPage ? "disabled" : "") 
+                    a(href=lastPage ? "#" : "?p=" + (1 + page),
+                        onclick=lastPage ? "" : "$('#page').val(#{1 + page}); $('#filter').submit(); return false") Earlier

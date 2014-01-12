@@ -1,0 +1,35 @@
+extends ../layout
+
+block content
+    .row
+        ol.breadcrumb
+            li: a(href="/") Home
+            li: a(href="/category") Categories
+            li.active= category.name
+    .row
+        .col-md-6
+            h1 Category &quot;#{category.name}&quot;
+
+            table.table.table-hover.table-condensed
+                tr
+                    th Date
+                    th Caption
+                    th Amount
+                    th Price
+                    th Total
+
+                -expenses.forEach(function (expense) {
+                    tr
+                        td= expense.formatDate()
+                        td: a(href="/expense/#{expense._id}")= expense.name
+                        td= expense.count
+                        td= expense.price.toFixed(2)
+                        td= expense.sum.toFixed(2)
+                -});
+
+            ul.pager
+                li.previous(class=page > 1 ? "" : "disabled") 
+                    a(href=page > 1 ? "?p=" + (page - 1) : "#") Later
+                li: span Page #{page} of #{totalPages}
+                li.next(class=lastPage ? "disabled" : "") 
+                    a(href=lastPage ? "#" : "?p=" + (1 + page)) Earlier
